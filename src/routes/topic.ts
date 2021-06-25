@@ -44,6 +44,12 @@ router.get('/getListTopic', async (req,res) => {
 router.get('/:topic',async (req,res) => {
   const listPost: any = []
   const rand = Math.floor(Math.random()*10)
+  listPost.push({
+    id: 11,
+    title: "New Title at 12:53 AM",
+    content: await fetch("http://metaphorpsum.com/paragraphs/"+rand).then(reponse => reponse.text()),
+    thumbnailUrl: `https://picsum.photos/id/${rand}/1000/600`
+  })
   for (let i = 0; i < 11; i++) {
     listPost.push({
       id: i.toString(),
