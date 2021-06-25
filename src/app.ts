@@ -7,7 +7,7 @@ const dev = process.env.NODE_ENV !== 'production'
 const port = process.env.PORT || 5055;
 
 const server = express()
-server.use('/api', routes)
+server.use('/', routes)
 server.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
 });
