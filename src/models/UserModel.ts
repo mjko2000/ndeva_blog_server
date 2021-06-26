@@ -16,11 +16,12 @@ interface User extends Document {
 interface UserInstance extends Model<User> {
   signUp: (input: User) => Promise<User>;
   generateHashPassword: (password: string) => string;
+  getFromToken: (token: string) => Promise<User>;
 }
 
 const UserSchema = new Schema<User>({
-  username: { type: String, required: true },
-  email: { type: String, required: true },
+  username: { type: String, required: true, lowercase: true },
+  email: { type: String, required: true, lowercase: true },
   avatar: String,
   password: { type: String, require: true, select: false }
 },
@@ -33,11 +34,20 @@ UserSchema.methods.comparePassword = function(password) {
 UserSchema.methods.generateAuthToken = function() {
   // Generate an auth token for the user
   const user = this
-  const token = jwt.sign({_id: user._id}, SECRET_KEY, {expiresIn: '7d'})
+  const token = jwt.sign({id: user.id}, SECRET_KEY, {expiresIn: '7d'})
   return token
 }
 UserSchema.statics.generateHashPassword = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync());
+};
+UserSchema.statics.getFromToken = async function(token) {
+  try{
+    const data: any = jwt.verify(token,SECRET_KEY)
+    return UserModel.findById(data.id)
+  }
+  catch(err){
+    return null
+  }
 };
 UserSchema.statics.signUp = function(input: User) {
   return UserModel.create({

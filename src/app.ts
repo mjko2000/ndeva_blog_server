@@ -20,7 +20,7 @@ server.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
 });
 
-Mongoose.connect('mongodb://localhost:27017/ndeva_blog', {
+Mongoose.connect('mongodb+srv://admin:icui4cua@cluster0.emxzy.mongodb.net/ndeva_blog?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
