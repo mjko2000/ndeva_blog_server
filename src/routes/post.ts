@@ -25,8 +25,8 @@ router.get('/:id', async (req: Request, res: Response) => {
   const data = {
     id,
     thumbnailUrl: `https://picsum.photos/id/${id}/3000/1600`,
-    title: (await fetch("http://metaphorpsum.com/sentences/1").then(reponse => reponse.text()) + '<script type="text/javascript">alert("ASDASD")</script>' ),
-    content: await fetch("http://metaphorpsum.com/paragraphs/8?p=true").then(reponse => reponse.text())
+    title: await fetch("http://metaphorpsum.com/sentences/1").then(reponse => reponse.text()),
+    content: ('<script type="text/javascript">alert("ASDASD")</script>' + await fetch("http://metaphorpsum.com/paragraphs/8?p=true").then(reponse => reponse.text()) )
   }
   res.status(200).json({
     resultCode: 1,
