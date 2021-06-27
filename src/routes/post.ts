@@ -22,11 +22,21 @@ router.get('/getListPost', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   const {id} = req.params
+  function stripScripts(s: string) {
+    var div = document.createElement('div');
+    div.innerHTML = s;
+    var scripts = div.getElementsByTagName('script');
+    var i = scripts.length;
+    while (i--) {
+      scripts[i].parentNode.removeChild(scripts[i]);
+    }
+    return div.innerHTML;
+  }
   const data = {
     id,
     thumbnailUrl: `https://picsum.photos/id/${id}/3000/1600`,
     title: await fetch("http://metaphorpsum.com/sentences/1").then(reponse => reponse.text()),
-    content: ('<script type="text/javascript">alert("ASDASD")</script>' + await fetch("http://metaphorpsum.com/paragraphs/8?p=true").then(reponse => reponse.text()) )
+    content: stripScripts('<script type="text/javascript">alert("ASDASD")</script>' + await fetch("http://metaphorpsum.com/paragraphs/8?p=true").then(reponse => reponse.text()) )
   }
   res.status(200).json({
     resultCode: 1,
