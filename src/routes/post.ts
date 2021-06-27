@@ -22,15 +22,12 @@ router.get('/getListPost', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   const {id} = req.params
-  function stripScripts(s: string) {
-    var div = document.createElement('div');
-    div.innerHTML = s;
-    var scripts = div.getElementsByTagName('script');
-    var i = scripts.length;
-    while (i--) {
-      scripts[i].parentNode.removeChild(scripts[i]);
+  function stripScripts(text: string) {
+    var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    while (SCRIPT_REGEX.test(text)) {
+        text = text.replace(SCRIPT_REGEX, "");
     }
-    return div.innerHTML;
+    return text;
   }
   const data = {
     id,
