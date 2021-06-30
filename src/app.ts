@@ -3,18 +3,21 @@ import express, { Request, Response, urlencoded } from "express";
 import cors from 'cors'
 import routes from './routes'
 import Mongoose from 'mongoose'
-
-dotenv.config()
+import formData from "express-form-data";
+dotenv.config({})
 
 const dev = process.env.NODE_ENV !== 'production'
-const port = process.env.PORT || 5055;
+const port = process.env.PORT || 5050;
 
 const server = express()
-server.use(express.json())
-server.use(urlencoded({
-    extended: true
-}))
+server.use('/static', express.static('files'))
 server.use(cors())
+server.use(express.urlencoded({
+    extended: false
+}))
+server.use(express.json())
+server.use(formData.parse());
+server.use(formData.union());
 server.use(routes)
 server.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
@@ -26,4 +29,4 @@ Mongoose.connect('mongodb+srv://admin:icui4cua@cluster0.emxzy.mongodb.net/ndeva_
 }).then(() => {
     console.log("Database is running!");
 })
-.catch(err => console.log(err));
+    .catch(err => console.log(err));

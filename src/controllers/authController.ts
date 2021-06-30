@@ -1,43 +1,44 @@
 import { Request, Response } from "express";
+import fileHandler from "../helpers/fileHandler";
 import UserModel from "../models/UserModel";
-import { withErrorResponse, withResponse } from "./constance";
+import { withInternalError, withSuccess, withError } from "./constance";
 
 export const signInController = (req: Request, res: Response) => {
-  const { username, password } = req.body
-  if (!username || !password) return withResponse(res, -1, null, "Vui lòng điền đầy đủ thông tin")
-  UserModel.findOne({ username }).select("+password").then(user => {
-    if (user && user.comparePassword(password)) return withResponse(res, 1, {
+  const { email, password } = req.body
+  if (!email || !password) return withError(res, "Vui lòng điền đầy đủ thông tin")
+  UserModel.findOne({ email }).select("+password").then(user => {
+    if (user && user.comparePassword(password)) return withSuccess(res, {
       userInfo: {
-        username: user.username,
+        displayName: user.displayName,
         email: user.email,
         avatar: user.avatar
       },
       accessToken: user.generateAuthToken()
     }, "OK")
-    withResponse(res, -1, null, "Sai tên tài khoản hoặc mật khẩu")
+    withError(res, "Sai tên tài khoản hoặc mật khẩu")
   }).catch(err => {
     console.log(err);
-    withErrorResponse(res)
+    withInternalError(res)
   })
 }
 
 export const signUpController = async (req: Request, res: Response) => {
-  const { email, username, password, rePassword } = req.body
-  if (!email || !username || !password || !rePassword)
-    return res.status(200).json({
-      resultCode: -1,
-      data: null,
-      message: "Vui lòng điền đầy đủ thông tin"
-    })
-  if (username.length < 8) return withResponse(res, -1, null, "Username is too short")
-  if (password.length < 8) return withResponse(res, -1, null, "Password is too week")
-  if (password !== rePassword) return withResponse(res, -1, null, "Retype password is not match")
-  const currentUser = await UserModel.findOne({ username })
-  if (currentUser) return withResponse(res, -1, null, "Username is nnavailble")
-  UserModel.signUp(req.body).then(user => {
-    withResponse(res, 1, {
+  const { email, displayName, password, rePassword } = req.body
+  if (!email || !displayName || !password || !rePassword )
+    return withError(res, "Vui lòng điền đầy đủ thông tin")
+  if (displayName.length < 8) return withError(res, "displayName is too short")
+  if (password.length < 8) return withError(res, "Password is too week")
+  if (password !== rePassword) return withError(res, "Retype password is not match")
+  const currentUser = await UserModel.findOne({ displayName })
+  if (currentUser) return withError(res, "displayName is unavailble")
+  UserModel.signUp({
+    displayName,
+    email,
+    password
+  }).then(user => {
+    withSuccess(res, {
       userInfo: {
-        username: user.username,
+        displayName: user.displayName,
         email: user.email,
         avatar: user.avatar
       },
@@ -45,18 +46,18 @@ export const signUpController = async (req: Request, res: Response) => {
     }, "OK")
   }).catch(err => {
     console.log(err);
-    withErrorResponse(res)
+    withInternalError(res)
   })
 }
 
 export const getInfoFromToken = async (req: Request, res: Response) => {
   const { token } = req.body
   UserModel.getFromToken(token).then(user => {
-    if(user) return withResponse(res,1,{
+    if(user) return withSuccess(res,{
       ...user.toObject()
     },"OK")
-    withErrorResponse(res)
+    withInternalError(res)
   }).catch(err => {
-    withErrorResponse(res)
+    withInternalError(res)
   })
 }
