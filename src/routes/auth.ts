@@ -14,9 +14,9 @@ router.get('/google', passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 router.get('/google/callback', passport.authenticate('google'),async function (req:any, res) {
-  const domain = process.env.NODE_ENV === 'production' ? 'https://serene-ocean-09276.herokuapp.com' : 'http://localhost:3000'
-  res.cookie('accessToken',req.user.generateAuthToken(),{domain: '.herokuapp.com'})
-  res.redirect(302,domain)
+  const redirectUrl = process.env.NODE_ENV === 'production' ? 'https://serene-ocean-09276.herokuapp.com' : 'http://localhost:3000'
+  res.cookie('accessToken',req.user.generateAuthToken(),{domain: 'herokuapp.com'})
+  res.redirect(302,redirectUrl)
 });
 
 export default router
