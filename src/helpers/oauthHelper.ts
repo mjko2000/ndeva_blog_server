@@ -17,7 +17,7 @@ passport.deserializeUser((id, done) => {
 passport.use(new GoogleStrategy({
   clientID: "178105242301-b5dt5bvmrorgkju3m5ch16mrrau009ks.apps.googleusercontent.com",
   clientSecret: "cEKJqxhkHhDNcttPoX6D7em9",
-  callbackURL: '/auth/google/callback'
+  callbackURL: process.env.NODE_ENV === 'production' ? 'https://serene-peak-90910.herokuapp.com/auth/google/callback' : 'http://localhost:5050/auth/google/callback'
 }, (accessToken: string,refreshToken: string, profile: Profile,done: VerifyCallback) => {
   if (profile.id) {
     UserModel.findOne({googleId: profile.id})
